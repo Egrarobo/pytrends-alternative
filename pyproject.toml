@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gtrends-api"
+version = "0.1.0"
+description = "pytrends alternative: Google Trends API for Python without 429 errors"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = ["requests>=2.20", "pandas>=1.0"]
+keywords = ["google trends", "pytrends", "google trends api", "seo", "keyword research"]
+
+[project.urls]
+Homepage = "https://github.com/Egrarobo/pytrends-alternative"
+"Google Trends Scraper" = "https://apify.com/egra_van/google-trends-reliable"
+
+[tool.setuptools]
+packages = ["gtrends_api"]
