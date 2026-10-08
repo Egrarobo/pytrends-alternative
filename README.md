@@ -1,6 +1,6 @@
-# pytrends alternative: Google Trends API for Python without 429 errors
+# pytrends alternative: Google Trends API for Python, with 429 retries handled remotely
 
-**pytrends is archived and Google Trends blocks it with `429 Too Many Requests`.** Google's official Trends API is still in closed alpha. This small library gives you the same `TrendReq` interface as pytrends, but the requests run on a managed scraper that rotates IPs and sessions, retries blocked calls and falls back to a real browser, so your code just gets the data.
+**pytrends is archived and Google Trends blocks it with `429 Too Many Requests`.** Google's official Trends API is still in closed alpha. This small library gives you the same `TrendReq` interface as pytrends, but the requests run on a managed scraper that rotates IPs and sessions, retries `429` errors automatically on fresh IPs and falls back to a real browser. Google still blocks some requests; the scraper retries them for you, so in most runs your code just gets the data. Terms that still fail are not billed.
 
 ```python
 from gtrends_api import TrendReq   # was: from pytrends.request import TrendReq
@@ -27,11 +27,11 @@ date
 
 | | pytrends | this library |
 |---|---|---|
-| `429 Too Many Requests` | Frequent, especially from servers and notebooks | Handled for you: new IP + new Google session on every retry |
+| `429 Too Many Requests` | Frequent, especially from servers and notebooks | Still happens, but retried automatically on a fresh IP + new Google session |
 | Maintained | Archived (read-only) since April 2025 | Maintained |
 | Interface | `TrendReq`, `build_payload`, `interest_over_time`… | Same method names, same DataFrame shapes |
 | Hundreds of keywords | Manual batching, not comparable between batches | Available via `raw()` with an anchor term on one scale |
-| Cost | Free, but blocked | Pay per keyword: about $4 per 1,000 terms. Apify's free plan includes a small monthly credit, enough to try it |
+| Cost | Free, but blocked | Pay per keyword: $0.003 per keyword (about $3 per 1,000) on Apify's Free and Starter plans, less on Scale ($2.20 per 1,000) and Business ($1.50 per 1,000). Each method call is billed separately (see [Pricing](#pricing)). Apify's free plan includes a small monthly credit, enough to try it |
 
 ## Install
 
@@ -84,6 +84,26 @@ print(pytrends.trending_searches(pn="united_kingdom")[["rank", "title", "approxT
 ```
 
 **Many keywords on one scale** (more than 5 terms, comparable with each other): call the scraper directly with an anchor term, see the [scraper page](https://apify.com/egra_van/google-trends-reliable).
+
+## Pricing
+
+You pay Apify per keyword for which all requested data was collected:
+
+| Apify plan | Price per keyword | Per 1,000 keywords |
+|---|---|---|
+| Free, Starter | $0.003 | $3.00 |
+| Scale | $0.0022 | $2.20 |
+| Business and higher | $0.0015 | $1.50 |
+
+Plus a tiny start fee per run ($0.00005). Failed keywords are free.
+
+**Each method call is a separate run on Apify and is billed per keyword.** For example, 2 keywords with `interest_over_time()`, `interest_by_region()` and `related_queries()` are billed as 6 keywords. To get the timeline, regions and related queries in one run, billed once per keyword, use:
+
+```python
+data = pytrends.raw(interestOverTime=True, interestByRegion=True, relatedQueries=True)
+```
+
+`raw()` returns the full JSON instead of DataFrames. Repeating the same method call with the same payload is cached and not billed again.
 
 ## No Python? Use it from anywhere
 

@@ -1,4 +1,4 @@
-"""A pytrends-style Google Trends client that never hits 429 errors.
+"""A pytrends-style Google Trends client that runs the requests on a managed scraper.
 
 The heavy lifting (sessions, proxies, retries, cookies, captchas) runs on the
 Google Trends Scraper on Apify: https://apify.com/egra_van/google-trends-reliable

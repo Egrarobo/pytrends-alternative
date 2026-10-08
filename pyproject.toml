@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gtrends-api"
 version = "0.1.0"
-description = "pytrends alternative: Google Trends API for Python without 429 errors"
+description = "pytrends alternative: Google Trends for Python, with 429 retries handled remotely"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
