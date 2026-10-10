@@ -1,6 +1,6 @@
 # pytrends alternative: Google Trends API for Python, with 429 retries handled remotely
 
-**pytrends is archived and Google Trends blocks it with `429 Too Many Requests`.** Google's official Trends API is still in closed alpha. This small library gives you the same `TrendReq` interface as pytrends, but the requests run on a managed scraper that rotates IPs and sessions, retries `429` errors automatically on fresh IPs and falls back to a real browser. Google still blocks some requests; the scraper retries them for you, so in most runs your code just gets the data. Terms that still fail are not billed.
+**pytrends is archived and Google Trends blocks it with `429 Too Many Requests`.** Google's official Trends API is still in closed alpha. This small library gives you the same `TrendReq` interface as pytrends, but the requests run on a managed scraper: each request is paced and retried with a fresh Google session; if Google keeps refusing, it falls back to the embeddable chart pages and, last, to a real browser. Retries and time limits are fixed, so runs end instead of hanging. Google still refuses some requests. Terms that still fail are not billed.
 
 ```python
 from gtrends_api import TrendReq   # was: from pytrends.request import TrendReq
@@ -12,22 +12,27 @@ df = pytrends.interest_over_time()
 print(df.tail())
 ```
 
-Example output (illustrative values):
+Output of a real run on October 10, 2026 (about 30 seconds):
 
 ```
             coffee  tea  isPartial
-date
-2026-08-30      78   41      False
-2026-09-06      80   40      False
-2026-09-13      79   42      False
-2026-09-20      77   41       True
+date                              
+2026-09-06      74   31      False
+2026-09-13      74   31      False
+2026-09-20      74   33      False
+2026-09-27      70   31      False
+2026-10-04      70   30       True
 ```
+
+## Is there an official Google Trends API?
+
+Yes, in closed alpha: Google opened applications on July 24, 2025 and, as of October 10, 2026, still admits "a limited set of developers" ([API page](https://developers.google.com/search/apis/trends)). If you're not in it, this library gives you the pytrends interface today. Other official options: the CSV download on the Google Trends site, the Google Trends BigQuery dataset and the Trending Now RSS feed.
 
 ## Why switch
 
 | | pytrends | this library |
 |---|---|---|
-| `429 Too Many Requests` | Frequent, especially from servers and notebooks | Still happens, but retried automatically on a fresh IP + new Google session |
+| `429 Too Many Requests` | Frequent, especially from servers and notebooks | Still happens; paced, retried with a new Google session, then the embeddable charts and a real browser |
 | Maintained | Archived (read-only) since April 2025 | Maintained |
 | Interface | `TrendReq`, `build_payload`, `interest_over_time`… | Same method names, same DataFrame shapes |
 | Hundreds of keywords | Manual batching, not comparable between batches | Available via `raw()` with an anchor term on one scale |
